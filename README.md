@@ -1,36 +1,145 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UG Blog Service
 
-## Getting Started
+一个基于 Next.js 和 Prisma 的博客服务项目，提供博客文章的管理和展示功能。
 
-First, run the development server:
+## 技术栈
+
+- **前端框架**: Next.js 15 (App Router)
+- **数据库 ORM**: Prisma
+- **数据库**: PostgreSQL
+- **语言**: TypeScript
+- **样式**: Tailwind CSS (通过 PostCSS 配置)
+- **代码质量**: ESLint
+
+## 项目结构
+
+```
+├── prisma/
+│   ├── schema.prisma          # 数据库模式定义
+│   └── migrations/            # 数据库迁移文件
+├── src/
+│   ├── app/
+│   │   ├── api/posts/         # 博客文章 API 路由
+│   │   ├── posts/[id]/        # 动态文章页面
+│   │   └── page.tsx           # 首页
+│   └── lib/
+│       └── prisma.ts          # Prisma 客户端配置
+└── public/                    # 静态资源
+```
+
+## 快速开始
+
+### 环境要求
+
+- Node.js 18+
+- PostgreSQL 数据库
+- npm 或 yarn 或 pnpm
+
+### 安装依赖
+
+```bash
+npm install
+# 或
+yarn install
+# 或
+pnpm install
+```
+
+### 数据库配置
+
+1. 确保 PostgreSQL 数据库已运行
+2. 配置 `.env` 文件中的 `DATABASE_URL`
+3. 运行数据库迁移：
+
+```bash
+npx prisma migrate dev
+```
+
+4. 生成 Prisma 客户端：
+
+```bash
+npx prisma generate
+```
+
+### 运行开发服务器
 
 ```bash
 npm run dev
-# or
+# 或
 yarn dev
-# or
+# 或
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 [http://localhost:3000](http://localhost:3000) 查看应用。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## API 接口
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 获取所有文章
 
-## Learn More
+```
+GET /api/posts
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 获取单篇文章
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+GET /api/posts/[id]
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 数据库模式
 
-## Deploy on Vercel
+项目使用 Prisma 定义数据库模式，主要包含以下模型：
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `Post`: 博客文章
+  - `id`: 唯一标识
+  - `title`: 文章标题
+  - `content`: 文章内容
+  - `createdAt`: 创建时间
+  - `updatedAt`: 更新时间
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 开发命令
+
+```bash
+# 开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
+
+# 启动生产服务器
+npm start
+
+# 代码检查
+npm run lint
+```
+
+## 部署
+
+### Vercel 部署
+
+1. 连接 GitHub 仓库到 Vercel
+2. 配置环境变量 `DATABASE_URL`
+3. 部署应用
+
+### 其他部署方式
+
+参考 Next.js 官方部署文档：[https://nextjs.org/docs/app/building-your-application/deploying](https://nextjs.org/docs/app/building-your-application/deploying)
+
+## 贡献
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
+
+## 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 联系方式
+
+项目维护者: [uguang2003](https://github.com/uguang2003)
+
+项目链接: [https://github.com/uguang2003/ug-blog-service](https://github.com/uguang2003/ug-blog-service)

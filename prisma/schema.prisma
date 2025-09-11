@@ -14,12 +14,146 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 在文件末尾添加下面的代码块
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?  // '?' 表示这个字段是可选的，可以为空
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+/// 用户表
+model User {
+  /// 用户ID
+  id          BigInt   @id @default(autoincrement())
+  /// 用户头像
+  avatar      String?
+  /// 创建时间
+  createTime  DateTime?
+  /// 用户邮箱
+  email       String?
+  /// 用户昵称
+  nickname    String?
+  /// 用户密码
+  password    String?
+  /// 用户类型
+  type        Int?
+  /// 更新时间
+  updateTime  DateTime?
+  /// 用户名
+  username    String?
+  /// 关联的博客
+  blogs       Blog[]
+}
+
+/// 分类表
+model Type {
+  /// 分类ID
+  id   BigInt @id @default(autoincrement())
+  /// 分类名称
+  name String
+  /// 关联的博客
+  blogs Blog[]
+}
+
+/// 博客表
+model Blog {
+  /// 博客ID
+  id             BigInt    @id @default(autoincrement())
+  /// 是否开启赞赏
+  appreciation   Boolean
+  /// 是否允许评论
+  commentabled   Boolean
+  /// 博客内容
+  content        String?
+  /// 创建时间
+  createTime     DateTime?
+  /// 博客描述
+  description    String?
+  /// 首图地址
+  firstPicture   String?
+  /// 博客标识
+  flag           String?
+  /// 是否发布
+  published      Boolean
+  /// 是否推荐
+  recommend      Boolean
+  /// 是否开启分享声明
+  shareStatement Boolean
+  /// 博客标题
+  title          String?
+  /// 更新时间
+  updateTime     DateTime?
+  /// 浏览次数
+  views          Int?
+  /// 分类ID
+  typeId         BigInt?
+  /// 用户ID
+  userId         BigInt?
+  /// 评论数量
+  commentCount   Int?
+  /// 关联的分类
+  type           Type?     @relation(fields: [typeId], references: [id])
+  /// 关联的用户
+  user           User?     @relation(fields: [userId], references: [id])
+  /// 关联的评论
+  comments       Comment[]
+}
+
+/// 评论表
+model Comment {
+  /// 评论ID
+  id                BigInt    @id @default(autoincrement())
+  /// 评论者昵称
+  nickname          String?
+  /// 评论者邮箱
+  email             String?
+  /// 评论内容
+  content           String?
+  /// 评论者头像
+  avatar            String?
+  /// 创建时间
+  createTime        DateTime?
+  /// 博客ID
+  blogId            BigInt?
+  /// 父评论ID
+  parentCommentId   BigInt?
+  /// 是否管理员评论
+  adminComment      Boolean
+  /// 关联的博客
+  blog              Blog?     @relation(fields: [blogId], references: [id])
+  /// 父评论
+  parentComment     Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  /// 子评论
+  replies           Comment[] @relation("CommentReplies")
+}
+
+/// 留言表
+model Message {
+  /// 留言ID
+  id               BigInt    @id @default(autoincrement())
+  /// 留言者昵称
+  nickname         String?
+  /// 留言者邮箱
+  email            String?
+  /// 留言内容
+  content          String?
+  /// 留言者头像
+  avatar           String?
+  /// 创建时间
+  createTime       DateTime?
+  /// 父留言ID
+  parentMessageId  BigInt?
+  /// 是否管理员留言
+  adminMessage     Boolean
+  /// 父留言
+  parentMessage    Message?  @relation("MessageReplies", fields: [parentMessageId], references: [id])
+  /// 子留言
+  replies          Message[] @relation("MessageReplies")
+}
+
+/// 图片表
+model Picture {
+  /// 图片ID
+  id                  BigInt @id @default(autoincrement())
+  /// 图片地址
+  pictureAddress      String?
+  /// 图片描述
+  pictureDescription  String?
+  /// 图片名称
+  pictureName         String?
+  /// 图片时间
+  pictureTime         String?
 }
