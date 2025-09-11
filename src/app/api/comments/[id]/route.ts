@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireAdmin } from '@/lib/auth';
 
-export async function DELETE(
+export const DELETE = requireAdmin(async (
   request: NextRequest,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
     const id = parseInt(params.id);
 
@@ -37,4 +38,4 @@ export async function DELETE(
     console.error('删除评论失败:', error);
     return NextResponse.json({ error: '删除失败' }, { status: 500 });
   }
-}
+});

@@ -75,16 +75,150 @@ pnpm dev
 
 ## API 接口
 
-### 获取所有文章
+### 用户认证
 
+#### 用户登录
 ```
-GET /api/posts
+PUT /api/users
+```
+请求体:
+```json
+{
+  "username": "admin",
+  "password": "password"
+}
+```
+响应:
+```json
+{
+  "token": "jwt-token-here",
+  "user": {
+    "id": 1,
+    "username": "admin",
+    "nickname": "管理员",
+    "email": "admin@example.com",
+    "avatar": "/avatar.jpg",
+    "type": 1
+  }
+}
 ```
 
-### 获取单篇文章
-
+#### 创建用户
 ```
-GET /api/posts/[id]
+POST /api/users
+```
+请求体:
+```json
+{
+  "username": "newuser",
+  "password": "password",
+  "nickname": "新用户",
+  "email": "user@example.com",
+  "avatar": "/avatar.jpg",
+  "type": 0
+}
+```
+
+### 后台管理 API (需要管理员权限)
+
+所有后台管理API都需要在请求头中包含Authorization: Bearer {token}
+
+#### 获取博客列表
+```
+GET /api/admin/blogs?page=1&pageSize=10&title=搜索标题&typeId=1
+```
+
+#### 创建博客
+```
+POST /api/admin/blogs
+```
+请求体:
+```json
+{
+  "title": "博客标题",
+  "content": "博客内容",
+  "description": "博客描述",
+  "firstPicture": "/image.jpg",
+  "published": true,
+  "recommend": false,
+  "commentabled": true,
+  "appreciation": false,
+  "shareStatement": false,
+  "typeId": 1
+}
+```
+
+#### 获取单个博客
+```
+GET /api/admin/blogs/[id]
+```
+
+#### 更新博客
+```
+PUT /api/admin/blogs/[id]
+```
+
+#### 删除博客
+```
+DELETE /api/admin/blogs/[id]
+```
+
+#### 获取分类列表
+```
+GET /api/admin/types
+```
+
+#### 创建分类
+```
+POST /api/admin/types
+```
+请求体:
+```json
+{
+  "name": "分类名称"
+}
+```
+
+#### 更新分类
+```
+PUT /api/admin/types/[id]
+```
+
+#### 删除分类
+```
+DELETE /api/admin/types/[id]
+```
+
+#### 获取统计信息
+```
+GET /api/admin/stats
+```
+
+### 前端博客展示 API
+
+#### 获取所有博客
+```
+GET /api/blogs
+```
+
+#### 获取单个博客
+```
+GET /api/blogs/[id]
+```
+
+#### 获取所有分类
+```
+GET /api/types
+```
+
+#### 获取评论
+```
+GET /api/comments
+```
+
+#### 创建评论
+```
+POST /api/comments
 ```
 
 ## 数据库模式

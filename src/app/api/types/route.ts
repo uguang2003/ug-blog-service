@@ -20,21 +20,3 @@ export async function GET() {
     return NextResponse.json({ error: '获取失败' }, { status: 500 });
   }
 }
-
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { name } = body;
-
-    const newType = await prisma.type.create({
-      data: {
-        name,
-      },
-    });
-
-    return NextResponse.json(newType, { status: 201 });
-  } catch (error) {
-    console.error('创建分类失败:', error);
-    return NextResponse.json({ error: '创建失败' }, { status: 500 });
-  }
-}
