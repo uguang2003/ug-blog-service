@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 export default function APIDocs() {
+  const BASE_URL = process.env.NEXT_PUBLIC_WEB_BASE_URL || 'http://localhost:3000';
   const [expandedEndpoints, setExpandedEndpoints] = useState<Set<string>>(new Set());
   const [jwtToken, setJwtToken] = useState('');
   const [testResults, setTestResults] = useState<Record<string, { loading: boolean; result: any; error: string }>>({});
@@ -36,7 +37,7 @@ export default function APIDocs() {
     }));
 
     try {
-      let url = `http://localhost:3000${endpoint.path}`;
+      let url = `${BASE_URL}${endpoint.path}`;
       const headers: Record<string, string> = {
         'Content-Type': 'application/json'
       };
@@ -128,7 +129,7 @@ export default function APIDocs() {
             { name: 'typeId', type: 'number', required: false, description: '分类ID' },
             { name: 'query', type: 'string', required: false, description: '搜索关键词' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/blogs?page=1&limit=10"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/blogs?page=1&limit=10"`,
           response: `{
   "blogs": [
     {
@@ -170,7 +171,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '博客ID' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/blogs/1"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/blogs/1"`,
           response: `{
   "id": 1,
   "title": "博客标题",
@@ -223,7 +224,7 @@ export default function APIDocs() {
             { name: 'blogId', type: 'number', required: false, description: '按博客ID筛选' },
             { name: 'parentCommentId', type: 'number', required: false, description: '父评论ID' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/comments?blogId=1"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/comments?blogId=1"`,
           response: `[
   {
     "id": 1,
@@ -267,7 +268,7 @@ export default function APIDocs() {
   "parentCommentId": null,
   "adminComment": false
 }`,
-          curlExample: `curl -X POST "http://localhost:3000/api/comments" \\
+          curlExample: `curl -X POST "${BASE_URL}/api/comments" \\
   -H "Content-Type: application/json" \\
   -d '{
     "nickname": "评论者",
@@ -304,7 +305,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '评论ID' }
           ],
-          curlExample: `curl -X DELETE "http://localhost:3000/api/comments/1" \\
+          curlExample: `curl -X DELETE "${BASE_URL}/api/comments/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "message": "删除成功"
@@ -325,7 +326,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'parentMessageId', type: 'number', required: false, description: '父留言ID' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/messages"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/messages"`,
           response: `[
   {
     "id": 1,
@@ -366,7 +367,7 @@ export default function APIDocs() {
   "parentMessageId": null,
   "adminMessage": false
 }`,
-          curlExample: `curl -X POST "http://localhost:3000/api/messages" \\
+          curlExample: `curl -X POST "${BASE_URL}/api/messages" \\
   -H "Content-Type: application/json" \\
   -d '{
     "nickname": "留言者",
@@ -397,7 +398,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '留言ID' }
           ],
-          curlExample: `curl -X DELETE "http://localhost:3000/api/messages/1" \\
+          curlExample: `curl -X DELETE "${BASE_URL}/api/messages/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "message": "删除成功"
@@ -415,7 +416,7 @@ export default function APIDocs() {
           description: '获取所有图片（公开接口）',
           key: 'pictures-GET',
           auth: '公开',
-          curlExample: `curl -X GET "http://localhost:3000/api/pictures"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/pictures"`,
           response: `[
   {
     "id": 1,
@@ -435,7 +436,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '图片ID' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/pictures/1"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/pictures/1"`,
           response: `{
   "id": 1,
   "pictureName": "图片名称",
@@ -456,7 +457,7 @@ export default function APIDocs() {
           description: '获取统计信息（公开接口）',
           key: 'stats-GET',
           auth: '公开',
-          curlExample: `curl -X GET "http://localhost:3000/api/stats"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/stats"`,
           response: `{
   "blogTotal": 100,
   "blogViewTotal": 5000,
@@ -476,7 +477,7 @@ export default function APIDocs() {
           description: '获取所有分类（公开接口）',
           key: 'types-GET',
           auth: '公开',
-          curlExample: `curl -X GET "http://localhost:3000/api/types"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/types"`,
           response: `[
   {
     "id": 1,
@@ -499,7 +500,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '分类ID' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/types/1"`,
+          curlExample: `curl -X GET "${BASE_URL}/api/types/1"`,
           response: `{
   "id": 1,
   "name": "分类名称",
@@ -532,7 +533,7 @@ export default function APIDocs() {
   "username": "用户名",
   "password": "密码"
 }`,
-          curlExample: `curl -X POST "http://localhost:3000/api/login" \\
+          curlExample: `curl -X POST "${BASE_URL}/api/login" \\
   -H "Content-Type: application/json" \\
   -d '{
     "username": "admin",
@@ -567,7 +568,7 @@ export default function APIDocs() {
             { name: 'title', type: 'string', required: false, description: '按标题搜索' },
             { name: 'typeId', type: 'number', required: false, description: '按分类筛选' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/admin/blogs?page=1&pageSize=10" \\
+          curlExample: `curl -X GET "${BASE_URL}/api/admin/blogs?page=1&pageSize=10" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "blogs": [
@@ -614,7 +615,7 @@ export default function APIDocs() {
   "shareStatement": false,
   "typeId": 1
 }`,
-          curlExample: `curl -X POST "http://localhost:3000/api/admin/blogs" \\
+          curlExample: `curl -X POST "${BASE_URL}/api/admin/blogs" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -659,7 +660,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '博客ID' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/admin/blogs/1" \\
+          curlExample: `curl -X GET "${BASE_URL}/api/admin/blogs/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "id": 1,
@@ -709,7 +710,7 @@ export default function APIDocs() {
   "shareStatement": true,
   "typeId": 2
 }`,
-          curlExample: `curl -X PUT "http://localhost:3000/api/admin/blogs/1" \\
+          curlExample: `curl -X PUT "${BASE_URL}/api/admin/blogs/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -754,7 +755,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '博客ID' }
           ],
-          curlExample: `curl -X DELETE "http://localhost:3000/api/admin/blogs/1" \\
+          curlExample: `curl -X DELETE "${BASE_URL}/api/admin/blogs/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "message": "删除成功"
@@ -776,7 +777,7 @@ export default function APIDocs() {
             { name: 'page', type: 'number', required: false, description: '页码 (默认: 1)' },
             { name: 'pageSize', type: 'number', required: false, description: '每页数量 (默认: 10)' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/admin/pictures?page=1&pageSize=10" \\
+          curlExample: `curl -X GET "${BASE_URL}/api/admin/pictures?page=1&pageSize=10" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "pictures": [
@@ -808,7 +809,7 @@ export default function APIDocs() {
   "pictureAddress": "拍摄地点",
   "pictureDescription": "图片描述"
 }`,
-          curlExample: `curl -X POST "http://localhost:3000/api/admin/pictures" \\
+          curlExample: `curl -X POST "${BASE_URL}/api/admin/pictures" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -834,7 +835,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '图片ID' }
           ],
-          curlExample: `curl -X GET "http://localhost:3000/api/admin/pictures/1" \\
+          curlExample: `curl -X GET "${BASE_URL}/api/admin/pictures/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "id": 1,
@@ -859,7 +860,7 @@ export default function APIDocs() {
   "pictureAddress": "新拍摄地点",
   "pictureDescription": "新图片描述"
 }`,
-          curlExample: `curl -X PUT "http://localhost:3000/api/admin/pictures/1" \\
+          curlExample: `curl -X PUT "${BASE_URL}/api/admin/pictures/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -885,7 +886,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '图片ID' }
           ],
-          curlExample: `curl -X DELETE "http://localhost:3000/api/admin/pictures/1" \\
+          curlExample: `curl -X DELETE "${BASE_URL}/api/admin/pictures/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "message": "删除成功"
@@ -903,7 +904,7 @@ export default function APIDocs() {
           description: '获取分类列表（管理员权限）',
           key: 'admin-types-GET',
           auth: '管理员',
-          curlExample: `curl -X GET "http://localhost:3000/api/admin/types" \\
+          curlExample: `curl -X GET "${BASE_URL}/api/admin/types" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `[
   {
@@ -924,7 +925,7 @@ export default function APIDocs() {
           body: `{
   "name": "分类名称"
 }`,
-          curlExample: `curl -X POST "http://localhost:3000/api/admin/types" \\
+          curlExample: `curl -X POST "${BASE_URL}/api/admin/types" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -947,7 +948,7 @@ export default function APIDocs() {
           body: `{
   "name": "新分类名称"
 }`,
-          curlExample: `curl -X PUT "http://localhost:3000/api/admin/types/1" \\
+          curlExample: `curl -X PUT "${BASE_URL}/api/admin/types/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -967,7 +968,7 @@ export default function APIDocs() {
           parameters: [
             { name: 'id', type: 'number', required: true, description: '分类ID' }
           ],
-          curlExample: `curl -X DELETE "http://localhost:3000/api/admin/types/1" \\
+          curlExample: `curl -X DELETE "${BASE_URL}/api/admin/types/1" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "message": "删除成功"
@@ -985,7 +986,7 @@ export default function APIDocs() {
           description: '获取统计信息（管理员权限）',
           key: 'admin-stats-GET',
           auth: '管理员',
-          curlExample: `curl -X GET "http://localhost:3000/api/admin/stats" \\
+          curlExample: `curl -X GET "${BASE_URL}/api/admin/stats" \\
   -H "Authorization: Bearer YOUR_JWT_TOKEN"`,
           response: `{
   "blogTotal": 100,
