@@ -4,13 +4,14 @@ import { requireAdmin } from '@/lib/auth';
 
 export const DELETE = requireAdmin(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const commentId = parseInt(id);
 
     const comment = await prisma.comment.findUnique({
-      where: { id },
+      where: { id: commentId },
     });
 
     if (!comment) {
@@ -18,7 +19,7 @@ export const DELETE = requireAdmin(async (
     }
 
     await prisma.comment.delete({
-      where: { id },
+      where: { id: commentId },
     });
 
     // 更新博客的评论数量

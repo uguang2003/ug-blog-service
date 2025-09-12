@@ -4,13 +4,14 @@ import { requireAdmin } from '@/lib/auth';
 
 export const DELETE = requireAdmin(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const messageId = parseInt(id);
 
     await prisma.message.delete({
-      where: { id },
+      where: { id: messageId },
     });
 
     return NextResponse.json({ message: '删除成功' });

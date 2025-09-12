@@ -3,13 +3,14 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const typeId = parseInt(id);
 
     const type = await prisma.type.findUnique({
-      where: { id },
+      where: { id: typeId },
       include: {
         blogs: true,
       },

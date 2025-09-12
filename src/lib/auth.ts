@@ -10,6 +10,12 @@ export interface AuthUser {
   type: number;
 }
 
+type ApiHandler<T extends Record<string, string> = Record<string, string>> = (request: NextRequest, context: { params: Promise<T> }) => Promise<NextResponse | Response>;
+
+interface ExtendedRequest extends NextRequest {
+  user?: AuthUser;
+}
+
 export function verifyToken(request: NextRequest): AuthUser | null {
   try {
     const authHeader = request.headers.get('authorization');
@@ -21,7 +27,7 @@ export function verifyToken(request: NextRequest): AuthUser | null {
     const decoded = jwt.verify(token, JWT_SECRET) as AuthUser;
 
     return decoded;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -34,8 +40,8 @@ export function hashPassword(password: string): string {
   return crypto.createHash('md5').update(password).digest('hex');
 }
 
-export function requireAuth(handler: Function) {
-  return async (request: NextRequest, ...args: any[]) => {
+export function requireAuth<T extends Record<string, string> = Record<string, string>>(handler: ApiHandler<T>) {
+  return async (request: NextRequest, context: { params: Promise<T> }) => {
     const user = verifyToken(request);
 
     if (!user) {
@@ -43,14 +49,14 @@ export function requireAuth(handler: Function) {
     }
 
     // 将用户信息添加到请求中
-    (request as any).user = user;
+    (request as ExtendedRequest).user = user;
 
-    return handler(request, ...args);
+    return handler(request, context);
   };
 }
 
-export function requireAdmin(handler: Function) {
-  return async (request: NextRequest, ...args: any[]) => {
+export function requireAdmin<T extends Record<string, string> = Record<string, string>>(handler: ApiHandler<T>) {
+  return async (request: NextRequest, context: { params: Promise<T> }) => {
     const user = verifyToken(request);
 
     if (!user) {
@@ -62,8 +68,8 @@ export function requireAdmin(handler: Function) {
       return NextResponse.json({ error: '需要管理员权限' }, { status: 403 });
     }
 
-    (request as any).user = user;
+    (request as ExtendedRequest).user = user;
 
-    return handler(request, ...args);
+    return handler(request, context);
   };
 }

@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth';
 
-export const GET = requireAdmin(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const GET = requireAdmin(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const pictureId = parseInt(id);
 
     const picture = await prisma.picture.findUnique({
-      where: { id },
+      where: { id: pictureId },
     });
 
     if (!picture) {
@@ -21,14 +22,15 @@ export const GET = requireAdmin(async (request: NextRequest, { params }: { param
   }
 });
 
-export const PUT = requireAdmin(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const PUT = requireAdmin(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const pictureId = parseInt(id);
     const body = await request.json();
     const { pictureAddress, pictureDescription, pictureName, pictureTime } = body;
 
     const updatedPicture = await prisma.picture.update({
-      where: { id },
+      where: { id: pictureId },
       data: {
         pictureAddress,
         pictureDescription,
@@ -44,12 +46,13 @@ export const PUT = requireAdmin(async (request: NextRequest, { params }: { param
   }
 });
 
-export const DELETE = requireAdmin(async (request: NextRequest, { params }: { params: { id: string } }) => {
+export const DELETE = requireAdmin(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const pictureId = parseInt(id);
 
     await prisma.picture.delete({
-      where: { id },
+      where: { id: pictureId },
     });
 
     return NextResponse.json({ message: '删除成功' });

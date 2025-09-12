@@ -4,10 +4,11 @@ import { requireAdmin } from '@/lib/auth';
 
 export const PUT = requireAdmin(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const typeId = parseInt(id);
     const body = await request.json();
     const { name } = body;
 
@@ -16,7 +17,7 @@ export const PUT = requireAdmin(async (
     }
 
     const updatedType = await prisma.type.update({
-      where: { id },
+      where: { id: typeId },
       data: {
         name: name.trim(),
       },
@@ -31,14 +32,15 @@ export const PUT = requireAdmin(async (
 
 export const DELETE = requireAdmin(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const typeId = parseInt(id);
 
     // 检查是否有博客使用此分类
     const blogCount = await prisma.blog.count({
-      where: { typeId: id },
+      where: { typeId: typeId },
     });
 
     if (blogCount > 0) {
@@ -46,7 +48,7 @@ export const DELETE = requireAdmin(async (
     }
 
     await prisma.type.delete({
-      where: { id },
+      where: { id: typeId },
     });
 
     return NextResponse.json({ message: '删除成功' });

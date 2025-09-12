@@ -4,13 +4,14 @@ import { requireAdmin } from '@/lib/auth';
 
 export const GET = requireAdmin(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const blogId = parseInt(id);
 
     const blog = await prisma.blog.findUnique({
-      where: { id },
+      where: { id: blogId },
       include: {
         type: true,
         user: {
@@ -48,10 +49,11 @@ export const GET = requireAdmin(async (
 
 export const PUT = requireAdmin(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const blogId = parseInt(id);
     const body = await request.json();
     const {
       title,
@@ -67,7 +69,7 @@ export const PUT = requireAdmin(async (
     } = body;
 
     const updatedBlog = await prisma.blog.update({
-      where: { id },
+      where: { id: blogId },
       data: {
         title,
         content,
@@ -102,13 +104,14 @@ export const PUT = requireAdmin(async (
 
 export const DELETE = requireAdmin(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const blogId = parseInt(id);
 
     await prisma.blog.delete({
-      where: { id },
+      where: { id: blogId },
     });
 
     return NextResponse.json({ message: '删除成功' });

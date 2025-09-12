@@ -3,13 +3,14 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id } = await params;
+    const blogId = parseInt(id);
 
     const blog = await prisma.blog.findUnique({
-      where: { id },
+      where: { id: blogId },
       include: {
         type: true,
         user: true,
@@ -27,7 +28,7 @@ export async function GET(
 
     // 增加浏览量
     await prisma.blog.update({
-      where: { id },
+      where: { id: blogId },
       data: { views: { increment: 1 } },
     });
 
