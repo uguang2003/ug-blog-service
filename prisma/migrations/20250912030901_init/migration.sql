@@ -1,15 +1,6 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Post` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE "public"."Post";
-
 -- CreateTable
 CREATE TABLE "public"."User" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "avatar" TEXT,
     "createTime" TIMESTAMP(3),
     "email" TEXT,
@@ -24,7 +15,7 @@ CREATE TABLE "public"."User" (
 
 -- CreateTable
 CREATE TABLE "public"."Type" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
 
     CONSTRAINT "Type_pkey" PRIMARY KEY ("id")
@@ -32,7 +23,7 @@ CREATE TABLE "public"."Type" (
 
 -- CreateTable
 CREATE TABLE "public"."Blog" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "appreciation" BOOLEAN NOT NULL,
     "commentabled" BOOLEAN NOT NULL,
     "content" TEXT,
@@ -46,8 +37,8 @@ CREATE TABLE "public"."Blog" (
     "title" TEXT,
     "updateTime" TIMESTAMP(3),
     "views" INTEGER,
-    "typeId" BIGINT,
-    "userId" BIGINT,
+    "typeId" INTEGER,
+    "userId" INTEGER,
     "commentCount" INTEGER,
 
     CONSTRAINT "Blog_pkey" PRIMARY KEY ("id")
@@ -55,14 +46,14 @@ CREATE TABLE "public"."Blog" (
 
 -- CreateTable
 CREATE TABLE "public"."Comment" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "nickname" TEXT,
     "email" TEXT,
     "content" TEXT,
     "avatar" TEXT,
     "createTime" TIMESTAMP(3),
-    "blogId" BIGINT,
-    "parentCommentId" BIGINT,
+    "blogId" INTEGER,
+    "parentCommentId" INTEGER,
     "adminComment" BOOLEAN NOT NULL,
 
     CONSTRAINT "Comment_pkey" PRIMARY KEY ("id")
@@ -70,13 +61,13 @@ CREATE TABLE "public"."Comment" (
 
 -- CreateTable
 CREATE TABLE "public"."Message" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "nickname" TEXT,
     "email" TEXT,
     "content" TEXT,
     "avatar" TEXT,
     "createTime" TIMESTAMP(3),
-    "parentMessageId" BIGINT,
+    "parentMessageId" INTEGER,
     "adminMessage" BOOLEAN NOT NULL,
 
     CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
@@ -84,7 +75,7 @@ CREATE TABLE "public"."Message" (
 
 -- CreateTable
 CREATE TABLE "public"."Picture" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "pictureAddress" TEXT,
     "pictureDescription" TEXT,
     "pictureName" TEXT,
@@ -92,6 +83,9 @@ CREATE TABLE "public"."Picture" (
 
     CONSTRAINT "Picture_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "public"."User"("username");
 
 -- AddForeignKey
 ALTER TABLE "public"."Blog" ADD CONSTRAINT "Blog_typeId_fkey" FOREIGN KEY ("typeId") REFERENCES "public"."Type"("id") ON DELETE SET NULL ON UPDATE CASCADE;

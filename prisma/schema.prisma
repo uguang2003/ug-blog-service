@@ -17,7 +17,7 @@ datasource db {
 /// 用户表
 model User {
   /// 用户ID
-  id          BigInt   @id @default(autoincrement())
+  id          Int   @id @default(autoincrement())
   /// 用户头像
   avatar      String?
   /// 创建时间
@@ -41,7 +41,7 @@ model User {
 /// 分类表
 model Type {
   /// 分类ID
-  id   BigInt @id @default(autoincrement())
+  id   Int @id @default(autoincrement())
   /// 分类名称
   name String
   /// 关联的博客
@@ -51,7 +51,7 @@ model Type {
 /// 博客表
 model Blog {
   /// 博客ID
-  id             BigInt    @id @default(autoincrement())
+  id             Int    @id @default(autoincrement())
   /// 是否开启赞赏
   appreciation   Boolean
   /// 是否允许评论
@@ -79,9 +79,9 @@ model Blog {
   /// 浏览次数
   views          Int?
   /// 分类ID
-  typeId         BigInt?
+  typeId         Int?
   /// 用户ID
-  userId         BigInt?
+  userId         Int?
   /// 评论数量
   commentCount   Int?
   /// 关联的分类
@@ -95,7 +95,7 @@ model Blog {
 /// 评论表
 model Comment {
   /// 评论ID
-  id                BigInt    @id @default(autoincrement())
+  id                Int    @id @default(autoincrement())
   /// 评论者昵称
   nickname          String?
   /// 评论者邮箱
@@ -107,9 +107,9 @@ model Comment {
   /// 创建时间
   createTime        DateTime?
   /// 博客ID
-  blogId            BigInt?
+  blogId            Int?
   /// 父评论ID
-  parentCommentId   BigInt?
+  parentCommentId   Int?
   /// 是否管理员评论
   adminComment      Boolean
   /// 关联的博客
@@ -123,7 +123,7 @@ model Comment {
 /// 留言表
 model Message {
   /// 留言ID
-  id               BigInt    @id @default(autoincrement())
+  id               Int    @id @default(autoincrement())
   /// 留言者昵称
   nickname         String?
   /// 留言者邮箱
@@ -135,7 +135,7 @@ model Message {
   /// 创建时间
   createTime       DateTime?
   /// 父留言ID
-  parentMessageId  BigInt?
+  parentMessageId  Int?
   /// 是否管理员留言
   adminMessage     Boolean
   /// 父留言
@@ -147,7 +147,7 @@ model Message {
 /// 图片表
 model Picture {
   /// 图片ID
-  id                  BigInt @id @default(autoincrement())
+  id                  Int @id @default(autoincrement())
   /// 图片地址
   pictureAddress      String?
   /// 图片描述
