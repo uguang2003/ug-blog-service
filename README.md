@@ -5,11 +5,13 @@
 ## 技术栈
 
 - **前端框架**: Next.js 15 (App Router)
-- **数据库 ORM**: Prisma
+- **数据库 ORM**: Prisma 6.14.0
 - **数据库**: PostgreSQL
-- **语言**: TypeScript
-- **样式**: Tailwind CSS (通过 PostCSS 配置)
-- **代码质量**: ESLint
+- **认证**: JWT (jsonwebtoken) + bcryptjs
+- **语言**: TypeScript 5
+- **样式**: Tailwind CSS 4 (通过 PostCSS 配置)
+- **代码质量**: ESLint 9
+- **包管理**: npm/yarn/pnpm
 
 ## 项目结构
 
@@ -19,12 +21,28 @@
 │   └── migrations/            # 数据库迁移文件
 ├── src/
 │   ├── app/
-│   │   ├── api/posts/         # 博客文章 API 路由
-│   │   ├── posts/[id]/        # 动态文章页面
+│   │   ├── api/               # API 路由
+│   │   │   ├── admin/         # 管理员 API
+│   │   │   │   ├── blogs/     # 博客管理
+│   │   │   │   ├── pictures/  # 图片管理
+│   │   │   │   ├── stats/     # 统计信息
+│   │   │   │   └── types/     # 分类管理
+│   │   │   ├── blogs/         # 前端博客 API
+│   │   │   ├── comments/      # 评论管理
+│   │   │   ├── login/         # 用户登录
+│   │   │   ├── messages/      # 留言管理
+│   │   │   ├── pictures/      # 图片管理
+│   │   │   ├── stats/         # 统计信息
+│   │   │   └── types/         # 分类管理
+│   │   ├── docs/              # API 文档页面
 │   │   └── page.tsx           # 首页
-│   └── lib/
+│   ├── components/            # React 组件
+│   ├── generated/             # Prisma 生成的文件
+│   └── lib/                   # 工具库
+│       ├── auth.ts            # 认证相关
 │       └── prisma.ts          # Prisma 客户端配置
-└── public/                    # 静态资源
+├── public/                    # 静态资源
+└── package.json               # 项目配置和依赖
 ```
 
 ## 快速开始
@@ -79,13 +97,13 @@ pnpm dev
 
 #### 用户登录
 ```
-PUT /api/users
+POST /api/login
 ```
 请求体:
 ```json
 {
-  "username": "admin",
-  "password": "password"
+  "username": "用户名",
+  "password": "密码"
 }
 ```
 响应:
@@ -94,28 +112,11 @@ PUT /api/users
   "token": "jwt-token-here",
   "user": {
     "id": 1,
-    "username": "admin",
-    "nickname": "管理员",
-    "email": "admin@example.com",
-    "avatar": "/avatar.jpg",
-    "type": 1
+    "username": "用户名",
+    "nickname": "昵称",
+    "avatar": "头像URL",
+    "type": 0
   }
-}
-```
-
-#### 创建用户
-```
-POST /api/users
-```
-请求体:
-```json
-{
-  "username": "newuser",
-  "password": "password",
-  "nickname": "新用户",
-  "email": "user@example.com",
-  "avatar": "/avatar.jpg",
-  "type": 0
 }
 ```
 
@@ -198,7 +199,7 @@ GET /api/admin/stats
 
 #### 获取所有博客
 ```
-GET /api/blogs
+GET /api/blogs?page=1&limit=10&recommend=true&typeId=1&query=搜索关键词
 ```
 
 #### 获取单个博客
@@ -213,7 +214,7 @@ GET /api/types
 
 #### 获取评论
 ```
-GET /api/comments
+GET /api/comments?blogId=1
 ```
 
 #### 创建评论
@@ -221,21 +222,96 @@ GET /api/comments
 POST /api/comments
 ```
 
+#### 获取留言
+```
+GET /api/messages
+```
+
+#### 创建留言
+```
+POST /api/messages
+```
+
+#### 获取图片
+```
+GET /api/pictures
+```
+
+#### 获取统计信息
+```
+GET /api/stats
+```
+
 ## 数据库模式
 
 项目使用 Prisma 定义数据库模式，主要包含以下模型：
 
-- `Post`: 博客文章
-  - `id`: 唯一标识
-  - `title`: 文章标题
-  - `content`: 文章内容
-  - `createdAt`: 创建时间
-  - `updatedAt`: 更新时间
+### User (用户表)
+- `id`: 用户ID (BigInt, 主键)
+- `avatar`: 用户头像 (String, 可选)
+- `createTime`: 创建时间 (DateTime, 可选)
+- `email`: 用户邮箱 (String, 可选)
+- `nickname`: 用户昵称 (String, 可选)
+- `password`: 用户密码 (String, 可选)
+- `type`: 用户类型 (Int, 可选)
+- `updateTime`: 更新时间 (DateTime, 可选)
+- `username`: 用户名 (String, 可选, 唯一)
+
+### Type (分类表)
+- `id`: 分类ID (BigInt, 主键)
+- `name`: 分类名称 (String)
+
+### Blog (博客表)
+- `id`: 博客ID (BigInt, 主键)
+- `appreciation`: 是否开启赞赏 (Boolean)
+- `commentabled`: 是否允许评论 (Boolean)
+- `content`: 博客内容 (String, 可选)
+- `createTime`: 创建时间 (DateTime, 可选)
+- `description`: 博客描述 (String, 可选)
+- `firstPicture`: 首图地址 (String, 可选)
+- `flag`: 博客标识 (String, 可选)
+- `published`: 是否发布 (Boolean)
+- `recommend`: 是否推荐 (Boolean)
+- `shareStatement`: 是否开启分享声明 (Boolean)
+- `title`: 博客标题 (String, 可选)
+- `updateTime`: 更新时间 (DateTime, 可选)
+- `views`: 浏览次数 (Int, 可选)
+- `typeId`: 分类ID (BigInt, 可选)
+- `userId`: 用户ID (BigInt, 可选)
+- `commentCount`: 评论数量 (Int, 可选)
+
+### Comment (评论表)
+- `id`: 评论ID (BigInt, 主键)
+- `nickname`: 评论者昵称 (String, 可选)
+- `email`: 评论者邮箱 (String, 可选)
+- `content`: 评论内容 (String, 可选)
+- `avatar`: 评论者头像 (String, 可选)
+- `createTime`: 创建时间 (DateTime, 可选)
+- `blogId`: 博客ID (BigInt, 可选)
+- `parentCommentId`: 父评论ID (BigInt, 可选)
+- `adminComment`: 是否管理员评论 (Boolean)
+
+### Message (留言表)
+- `id`: 留言ID (BigInt, 主键)
+- `nickname`: 留言者昵称 (String, 可选)
+- `email`: 留言者邮箱 (String, 可选)
+- `content`: 留言内容 (String, 可选)
+- `avatar`: 留言者头像 (String, 可选)
+- `createTime`: 创建时间 (DateTime, 可选)
+- `parentMessageId`: 父留言ID (BigInt, 可选)
+- `adminMessage`: 是否管理员留言 (Boolean)
+
+### Picture (图片表)
+- `id`: 图片ID (BigInt, 主键)
+- `pictureAddress`: 图片地址 (String, 可选)
+- `pictureDescription`: 图片描述 (String, 可选)
+- `pictureName`: 图片名称 (String, 可选)
+- `pictureTime`: 图片时间 (String, 可选)
 
 ## 开发命令
 
 ```bash
-# 开发服务器
+# 开发服务器 (使用 Turbopack)
 npm run dev
 
 # 构建生产版本
@@ -246,6 +322,21 @@ npm start
 
 # 代码检查
 npm run lint
+
+# 生成 Prisma 客户端
+npx prisma generate
+
+# 数据库迁移
+npx prisma migrate dev
+
+# 查看数据库状态
+npx prisma migrate status
+
+# 重置数据库
+npx prisma migrate reset
+
+# 打开 Prisma Studio
+npx prisma studio
 ```
 
 ## 部署

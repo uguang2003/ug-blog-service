@@ -563,6 +563,32 @@ export default function APIDocs() {
       ]
     },
     {
+      category: '用户认证',
+      basePath: '/api/login',
+      endpoints: [
+        {
+          method: 'POST',
+          path: '/api/login',
+          description: '用户登录',
+          key: 'login-POST',
+          body: `{
+  "username": "用户名",
+  "password": "密码"
+}`,
+          response: `{
+  "token": "jwt-token-here",
+  "user": {
+    "id": 1,
+    "username": "用户名",
+    "nickname": "昵称",
+    "avatar": "头像URL",
+    "type": 0
+  }
+}`
+        }
+      ]
+    },
+    {
       category: '用户管理',
       basePath: '/api/users',
       endpoints: [
@@ -572,16 +598,6 @@ export default function APIDocs() {
           description: '获取所有用户',
           key: 'users-GET',
           response: `[
-  {
-    "id": 1,
-    "username": "用户名",
-    "nickname": "昵称",
-    "email": "user@example.com",
-    "avatar": "头像URL",
-    "type": "admin",
-    "createTime": "2024-01-01T00:00:00Z",
-    "updateTime": "2024-01-01T00:00:00Z"
-  }
 ]`
         },
         {
