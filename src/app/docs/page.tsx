@@ -68,10 +68,14 @@ export default function APIDocs() {
 
       let body = null;
       if (endpoint.body) {
-        try {
-          body = JSON.parse(endpoint.body);
-        } catch (e) {
-          body = endpoint.body;
+        if (testParams[endpointKey] && Object.keys(testParams[endpointKey]).length > 0) {
+          body = testParams[endpointKey];
+        } else {
+          try {
+            body = JSON.parse(endpoint.body);
+          } catch (e) {
+            body = endpoint.body;
+          }
         }
       }
 
