@@ -1,13 +1,35 @@
 ﻿"use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function APIDocs() {
-  const BASE_URL = process.env.NEXT_PUBLIC_WEB_BASE_URL || 'http://localhost:3000';
+  // 从服务端 API 动态获取 BASE_URL
+  const [BASE_URL, setBaseURL] = useState('');
+  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
   const [expandedEndpoints, setExpandedEndpoints] = useState<Set<string>>(new Set());
   const [jwtToken, setJwtToken] = useState('');
   const [testResults, setTestResults] = useState<Record<string, { loading: boolean; result: any; error: string }>>({});
   const [testParams, setTestParams] = useState<Record<string, Record<string, string>>>({});
+
+  // 在组件加载时获取配置
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch('/api/config');
+        const data = await response.json();
+        // 优先使用环境变量,否则使用当前页面的 origin
+        setBaseURL(data.baseUrl || window.location.origin);
+      } catch (error) {
+        console.error('Failed to fetch config:', error);
+        // 失败时使用当前页面的 origin 作为后备
+        setBaseURL(window.location.origin);
+      } finally {
+        setIsLoadingConfig(false);
+      }
+    };
+    
+    fetchConfig();
+  }, []);
 
   const toggleExpanded = (endpointKey: string) => {
     const newExpanded = new Set(expandedEndpoints);
@@ -1009,6 +1031,18 @@ export default function APIDocs() {
     }
   };
 
+  // 加载配置时显示加载状态
+  if (isLoadingConfig) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">正在加载配置...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
@@ -1020,6 +1054,19 @@ export default function APIDocs() {
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             完整的RESTful API文档，包含详细的参数说明和示例
           </p>
+
+          {/* 当前 API 地址显示 */}
+          <div className="mt-6 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 max-w-4xl mx-auto">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
+              <strong>📍 当前 API 地址：</strong>
+              <code className="ml-2 px-2 py-1 bg-white dark:bg-gray-800 rounded text-blue-600 dark:text-blue-400">
+                {BASE_URL}
+              </code>
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              💡 此地址从运行时环境变量 NEXT_PUBLIC_WEB_BASE_URL 动态加载
+            </p>
+          </div>
 
           {/* JWT Token 输入框 */}
           <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 max-w-4xl mx-auto">

@@ -74,7 +74,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # 构建多平台镜像(可选,如果只需要 linux/amd64 可以删除这一行)
-          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
       # 第六步: 输出镜像信息
       - name: 输出镜像信息
