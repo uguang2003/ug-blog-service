@@ -4,14 +4,22 @@ name: Docker Build and Push
 # 触发条件
 on:
   # 当推送到 main 分支时触发
-  push:
-    branches:
-      - main
-    # 当创建新标签时触发
-    tags:
-      - 'v*'
+  # push:
+  #   branches:
+  #     - main
+  #   # 当创建新标签时触发
+  #   tags:
+  #     - 'v*'
   # 允许手动触发
   workflow_dispatch:
+    inputs:
+      target_branch:
+        description: '选择要在其上运行该 workflow 的分支（默认为 main）'
+        required: false
+        default: 'main'
+      build_tag:
+        description: '可选：手工输入要推送的 Docker 标签 (例如 v1.2.3)，不填则使用默认 tag 策略'
+        required: false
 
 jobs:
   # 构建和推送任务
