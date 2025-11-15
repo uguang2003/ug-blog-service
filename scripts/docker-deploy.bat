@@ -18,9 +18,9 @@ if %errorlevel% neq 0 (
 echo ✅ Docker 已安装
 
 :: 检查 Docker Compose 是否可用
-docker compose version >nul 2>&1
+docker-compose version >nul 2>&1
 if %errorlevel% equ 0 (
-    set DOCKER_COMPOSE=docker compose
+    set DOCKER_COMPOSE=docker-compose
     echo ✅ Docker Compose 可用
 ) else (
     docker-compose --version >nul 2>&1

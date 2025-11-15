@@ -1,6 +1,4 @@
 # Docker Compose 配置文件 - 用于本地开发和测试
-version: '3.8'
-
 services:
   # PostgreSQL 数据库服务
   postgres:
@@ -35,7 +33,7 @@ services:
       dockerfile: Dockerfile
       args:
         # 构建时传入公共环境变量
-        NEXT_PUBLIC_WEB_BASE_URL: https://api.blog.ug666.top
+        NEXT_PUBLIC_WEB_BASE_URL: localhost:6067
     container_name: ug-blog-app
     environment:
       # 数据库连接字符串
@@ -45,7 +43,7 @@ services:
       # Node 环境
       NODE_ENV: production
       # 运行时环境变量（虽然客户端组件用不到，但保留以备其他用途）
-      NEXT_PUBLIC_WEB_BASE_URL: https://api.blog.ug666.top
+      NEXT_PUBLIC_WEB_BASE_URL: localhost:6067
     ports:
       # 映射端口: 主机端口:容器端口
       - "6067:6067"
