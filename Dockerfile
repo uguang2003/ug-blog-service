@@ -24,6 +24,10 @@ COPY . .
 # 生成 Prisma 客户端
 RUN npx prisma generate
 
+# 设置构建时环境变量（用于客户端代码）
+ARG NEXT_PUBLIC_WEB_BASE_URL
+ENV NEXT_PUBLIC_WEB_BASE_URL=${NEXT_PUBLIC_WEB_BASE_URL}
+
 # 构建 Next.js 应用
 # 禁用遥测数据收集
 ENV NEXT_TELEMETRY_DISABLED=1
