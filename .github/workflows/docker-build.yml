@@ -7,9 +7,9 @@ on:
   push:
     branches:
       - main
-  # 当创建新标签时触发
-  tags:
-    - 'v*'
+    # 当创建新标签时触发
+    tags:
+      - 'v*'
   # 允许手动触发
   workflow_dispatch:
 
