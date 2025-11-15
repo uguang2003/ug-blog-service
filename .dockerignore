@@ -1,0 +1,44 @@
+# 依赖文件
+node_modules
+npm-debug.log*
+
+# Next.js 构建产物
+.next
+out
+
+# 生产环境文件
+.env.local
+.env.production.local
+.env.development.local
+.env.test.local
+
+# 测试文件
+coverage
+.nyc_output
+
+# 编辑器文件
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# Git 文件
+.git
+.gitignore
+
+# 文档和说明文件
+README.md
+*.md
+
+# Docker 文件(避免递归复制)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 其他
+.eslintcache

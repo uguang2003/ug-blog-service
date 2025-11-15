@@ -341,10 +341,106 @@ npx prisma studio
 
 ## 部署
 
+### Docker 部署
+
+#### 1. 准备工作
+
+确保已安装 Docker 和 Docker Compose。
+
+#### 2. 配置环境变量
+
+复制 `.env.example` 文件为 `.env` 并修改其中的配置：
+
+```bash
+cp .env.example .env
+```
+
+修改 `.env` 文件中的数据库连接和 JWT 密钥等配置。
+
+#### 3. 使用 Docker Compose 启动
+
+```bash
+# 启动所有服务(数据库 + 应用)
+docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
+
+# 停止服务并删除数据卷
+docker-compose down -v
+```
+
+应用将运行在 `http://localhost:6067`
+
+#### 4. 构建 Docker 镜像
+
+```bash
+# 构建镜像
+docker build -t ug-blog-service .
+
+# 运行容器(需要先有 PostgreSQL 数据库)
+docker run -d \
+  -p 6067:6067 \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/dbname" \
+  -e JWT_SECRET="your-secret-key" \
+  --name ug-blog-app \
+  ug-blog-service
+```
+
+### GitHub Actions 自动部署到 Docker Hub
+
+本项目已配置 GitHub Actions 自动化工作流，可以自动构建并推送 Docker 镜像到 Docker Hub。
+
+#### 配置步骤
+
+1. **在 Docker Hub 创建 Access Token**
+   - 访问 [Docker Hub](https://hub.docker.com/)
+   - 进入 Account Settings → Security → Access Tokens
+   - 点击 "New Access Token" 创建新令牌
+   - 保存生成的 token
+
+2. **在 GitHub 仓库配置 Secrets**
+   - 进入你的 GitHub 仓库
+   - 点击 Settings → Secrets and variables → Actions
+   - 点击 "New repository secret" 添加以下两个 secrets：
+     - `DOCKERHUB_USERNAME`: 你的 Docker Hub 用户名
+     - `DOCKERHUB_TOKEN`: 刚才创建的 Access Token
+
+3. **触发自动构建**
+   
+   工作流会在以下情况自动触发：
+   - 推送代码到 `main` 分支
+   - 创建新的 Git 标签(如 `v1.0.0`)
+   - 手动触发(在 Actions 页面点击 "Run workflow")
+
+4. **查看构建状态**
+   
+   在仓库的 "Actions" 标签页可以查看构建进度和日志
+
+5. **从 Docker Hub 拉取镜像**
+
+   ```bash
+   # 拉取最新版本
+   docker pull <你的Docker Hub用户名>/ug-blog-service:latest
+   
+   # 拉取特定版本
+   docker pull <你的Docker Hub用户名>/ug-blog-service:v1.0.0
+   
+   # 运行镜像
+   docker run -d \
+     -p 6067:6067 \
+     -e DATABASE_URL="postgresql://user:pass@host:5432/dbname" \
+     -e JWT_SECRET="your-secret-key" \
+     <你的Docker Hub用户名>/ug-blog-service:latest
+   ```
+
 ### Vercel 部署
 
 1. 连接 GitHub 仓库到 Vercel
-2. 配置环境变量 `DATABASE_URL`
+2. 配置环境变量 `DATABASE_URL` 和 `JWT_SECRET`
 3. 部署应用
 
 ### 其他部署方式

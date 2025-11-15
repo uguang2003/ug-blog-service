@@ -1,0 +1,63 @@
+# Docker Compose 配置文件 - 用于本地开发和测试
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库服务
+  postgres:
+    image: postgres:16-alpine
+    container_name: ug-blog-postgres
+    environment:
+      # 数据库名称
+      POSTGRES_DB: ugblog
+      # 数据库用户名
+      POSTGRES_USER: postgres
+      # 数据库密码(生产环境请修改)
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      # 映射端口: 主机端口:容器端口
+      - "5432:5432"
+    volumes:
+      # 持久化数据库数据
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - blog-network
+    # 健康检查
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js 应用服务
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ug-blog-app
+    environment:
+      # 数据库连接字符串
+      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/ugblog
+      # JWT 密钥(生产环境请修改为复杂的随机字符串)
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      # Node 环境
+      NODE_ENV: production
+    ports:
+      # 映射端口: 主机端口:容器端口
+      - "6067:6067"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - blog-network
+    # 应用启动前运行数据库迁移
+    command: sh -c "npx prisma migrate deploy && node server.js"
+
+# 数据卷定义
+volumes:
+  postgres_data:
+    driver: local
+
+# 网络定义
+networks:
+  blog-network:
+    driver: bridge

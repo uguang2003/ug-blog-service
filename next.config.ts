@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  /* config options here */
+  // 生成 standalone 输出，便于把构建产物打包并在没有源码的服务器上运行
+  output: 'standalone',
 };
 
 export default nextConfig;
