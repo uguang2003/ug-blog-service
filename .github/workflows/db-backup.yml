@@ -1,0 +1,47 @@
+name: Weekly DB Backup
+on:
+  schedule:
+    - cron: '15 3 * * 1'   # 每周一 UTC 03:15 = 北京 11:15（错开 ug-auth 的 03:00，避免同时刻并发抢 Neon 连接）
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo install -d /etc/apt/keyrings
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/keyrings/pgdg.gpg
+          sudo sh -c 'echo "deb [signed-by=/etc/apt/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Dump and gzip
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          DATE=$(date +%F-%H%M)
+          pg_dump --no-owner --no-acl "$DATABASE_URL" | gzip > "blog-backup-$DATE.sql.gz"
+          ls -lh blog-backup-*.sql.gz
+          echo "FILE=$(ls blog-backup-*.sql.gz)" >> $GITHUB_ENV
+
+      - name: Upload to Qiniu KODO (S3-compatible)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.QINIU_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.QINIU_SECRET_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.QINIU_REGION }}
+        run: |
+          aws s3 cp "$FILE" "s3://${{ secrets.QINIU_BUCKET }}/db-backup/blog/$FILE" \
+            --endpoint-url "https://s3-${{ secrets.QINIU_REGION }}.qiniucs.com"
+
+      - name: Cleanup backups older than 90 days
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.QINIU_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.QINIU_SECRET_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.QINIU_REGION }}
+        run: |
+          ENDPOINT="https://s3-${{ secrets.QINIU_REGION }}.qiniucs.com"
+          CUTOFF=$(date -d '90 days ago' +%Y-%m-%d)
+          aws s3 ls "s3://${{ secrets.QINIU_BUCKET }}/db-backup/blog/" --endpoint-url "$ENDPOINT" \
+            | awk -v c="$CUTOFF" '$1 < c {print $4}' \
+            | xargs -I{} -r aws s3 rm "s3://${{ secrets.QINIU_BUCKET }}/db-backup/blog/{}" --endpoint-url "$ENDPOINT" || true
