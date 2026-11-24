@@ -341,7 +341,7 @@ npx prisma studio
 
 ## 旧 Java 博客增量补齐
 
-2026-11-24 将 Java 博客独立为 [ug-blog-classic](https://github.com/uguang2003/ug-blog-classic)，保留线上 JAR 中的页面、样式和交互，页面只调用本服务现有公开 API。本轮没有改变 API、数据库 Schema 或 Astro 的调用方式。独立前端已完成用户界面验收，尚未上线；Java 服务和 MySQL `myblogplus` 原库继续保留。
+2026-11-24 将 Java 博客独立为 [ug-blog-classic](https://github.com/uguang2003/ug-blog-classic)，保留线上 JAR 中的页面、样式和交互，页面只调用本服务现有公开 API。本轮没有改变 API、数据库 Schema 或 Astro 的调用方式。独立前端已完成用户界面验收并部署 Vercel；原 Java 和 MySQL 已停止，制品与数据目录保留。
 
 已逐字段比较 MySQL 与正式 Neon `neondb`：30 篇文章的正文、标题、分类、封面及时间一致；6 个分类、3 条评论和 13 条留言一致；旧库没有独立标签表。正式库补入照片 ID 170–186 共 17 张，照片由 145 张增至 162 张，30 篇文章的阅读数取两库较大值。未导入旧管理账户、密码或邮箱，也未覆盖新库较新的文章版本。旧评论引用已不存在的父记录时保留为顶层，已有有效回复关系继续保留。
 
@@ -365,11 +365,17 @@ mise exec -- node scripts/sync-legacy.mjs
 
 2026-11-24 核对服务器：MySQL 只有 `myblogplus` 一个业务库，在线业务连接均来自旧 Java 博客；Auth、Storage、AIHub 使用独立 PostgreSQL，不依赖该 MySQL。`img.ug666.top` 按用户要求不在本次范围。
 
-已关闭旧 Java 的 systemd 开机启动、宝塔项目自动启动，以及 MySQL 的 SysV 开机启动。**当前 Java 和 MySQL 进程仍在运行**：`blog.ug666.top`、`blog.ug666.cn` 尚指向自建服务器。Classic 已部署至 [Vercel 默认正式地址](https://ug-blog-classic.vercel.app)，页面、资源、表单校验和桌面/手机部署回归通过，证据见其 README。用户负责配置自定义域名，并确认当前尚未切换。待正式入口切换后衔接停用，此处不表示迁出已完成。
+用户已将 [blog.ug666.top](https://blog.ug666.top) 和 [blog.ug666.cn](https://blog.ug666.cn) 切换至 Vercel 的 `ug-blog-classic`。两域名 CNAME 为 `7abcb3ca8d5e9c1d.vercel-dns-017.com`，HTTPS 响应包含 `X-Vercel-Id`。默认地址为 [ug-blog-classic.vercel.app](https://ug-blog-classic.vercel.app)，原界面和部署回归证据见 Classic README。
 
-实时核对为文章 30、分类 6、评论 3、留言 13、照片 162，增量计划 0 写入、0 冲突。新增 MySQL SQL 与 Neon 压缩快照均已在临时隔离数据库实际恢复核对，验证库已移除。Java JAR、运行配置和证书已归档，原目录保留。
+19:08 停止 Java 并导出停止写入后的最终 MySQL 快照，核对正式 Neon：文章 30、分类 6、评论 3、留言 13、照片 162，增量计划 0 写入、0 冲突，无需追加正式写入。此前 MySQL SQL 与 Neon 压缩快照均已在临时隔离数据库实际恢复核对，验证库已移除。
 
-本轮受限恢复材料在服务器 `/var/backups/ug-blog-retired-20261124/` 和工作区 `temp/blog-offserver-20261124/`；包含 `java-config-before.tar.gz`、`mysql-final-184833.sql`、`neon-before-final.dump` 和 `snapshot-restore-report.json`。本机副本只授权当前用户和 SYSTEM，不提交源码仓。待入口切换后，以停止 Java 后导出的最终数据再次核对，随后停止 MySQL、关闭托管恢复并保留数据目录；Auth / Storage 的每日与每周备份不调整，Blog 的 Neon 周备份继续沿用 ug-backups。
+Java 的 `spring_myblogplus-1_0_0-RELEASE_jar.service` 已停止、禁用并 mask，专属 drop-in 将 `Restart` 设为 `no`；宝塔项目的开机启动关闭，标记为主动停用。MySQL 已通过原 init 脚本正常关闭，`mysqld.service`、`mysql.service` 均 mask，所有 SysV 运行级别开机启动关闭。实测进程不存在、9996 和 3306 无监听，宝塔 Java 项目状态为停止。旧 MySQL 专属每日备份任务（ID 1）停用，其他任务不变。
+
+停用后复验两域名访客页面与本地图片/样式、两域名公开 API、新后台登录页和 Astro，共 20 个 HTTP 请求均 200。后台实际账号登录未在本轮验证。博客访客站、API/管理后台和 Neon 数据库均不再依赖本机；旧 Nginx/证书配置仍保留，正式 DNS 不再指向它，原 Java 上游已关闭，没有改动自定义域名绑定。`img.ug666.top` 按用户要求保持原样。
+
+恢复材料在服务器 `/var/backups/ug-blog-retired-20261124/` 和工作区 `temp/blog-offserver-20261124/`，目录受限，不提交源码仓：`java-config-before.tar.gz` 保留 JAR、配置和证书；`mysql-final-190810.sql` 为停止 Java 后的最终 SQL；`mysql-datadir-stopped.tar.gz` 为正常停库后的完整 MySQL 数据目录归档；`neon-before-final.dump` 为已验证的 Neon 快照。最终核对、HTTP、服务状态和 SHA-256 清单随归档保存。原 JAR、`/etc/myblogplus/`、`/www/server/data/` 均未删除，Java 和 MySQL 运行时未卸载。Auth / Storage 的每日与每周备份不调整，Blog 的 Neon 周备份继续沿用 ug-backups。
+
+需要回退时先核对切换后 Neon 的新增内容，不直接切回旧数据。使用保留的原目录，可以先 `systemctl unmask mysqld.service mysql.service spring_myblogplus-1_0_0-RELEASE_jar.service`，再通过 `/etc/init.d/mysqld start` 和 `systemctl start spring_myblogplus-1_0_0-RELEASE_jar.service` 手动恢复旧进程；确认数据和入口后再决定是否恢复自动启动。全量恢复材料的说明见本轮归档 README。
 
 ## 部署
 
@@ -477,7 +483,7 @@ docker run -d \
 
 当前生产项目为 `ug-blog-service`，API 域名为 `api.blog.ug666.top` 和 `api.blog.ug666.cn`。2026-11-24 将原 Neon `ugblog` 的业务表迁入 Vercel Storage 的 `ug-blog`（新加坡），关联生产、预览和开发环境；底层数据库名为 `neondb`。随后用户确认旧个人 Neon 已全部删除，原库不再作为只读回退副本或恢复来源。恢复使用 GitHub 私有仓库中的备份。
 
-自建服务器上的旧 PostgreSQL `ugblog`、同名账号及其专属备份定时任务已删除，独立快照已验证可恢复。账号遗留的两条 AIHub 默认授权规则已清理，AIHub 的表数据和对象归属保持不变；Java 博客的 MySQL `myblogplus` 仍保留。
+自建服务器上的旧 PostgreSQL `ugblog`、同名账号及其专属备份定时任务已删除，独立快照已验证可恢复。账号遗留的两条 AIHub 默认授权规则已清理，AIHub 的表数据和对象归属保持不变；Java 博客的 MySQL `myblogplus` 已停用，原数据目录和恢复归档保留。
 
 数据库备份由私有仓库 [ug-backups](https://github.com/uguang2003/ug-backups) 负责：每周一北京时间 11:15，从 Vercel 关联的 `ug-blog` 正式库导出 PostgreSQL 压缩备份，直接提交到该仓库的 `db/ug-blog/backups/`，长期保留并由用户手动清理。每次提交后重新检出、校验，并在隔离 PostgreSQL 18 中实际恢复核对；校验不再导出正式库。备份无需解密，恢复步骤见该仓库的 `db/ug-blog/README.md`。本仓库原七牛备份工作流已移除；保留的七牛 AK/SK 不参与当前备份。
 
