@@ -361,6 +361,16 @@ mise exec -- node scripts/sync-legacy.mjs
 
 本轮快照和验收证据集中保留在工作区 `temp/blog-classic-20261124/`，不提交数据库快照、个人信息或连接配置。隔离表单提交验证见该目录 `form-report.json`；正式迁移结果见 `production-execute.json`。
 
+### 自建 Java / MySQL 退出状态
+
+2026-11-24 核对服务器：MySQL 只有 `myblogplus` 一个业务库，在线业务连接均来自旧 Java 博客；Auth、Storage、AIHub 使用独立 PostgreSQL，不依赖该 MySQL。`img.ug666.top` 按用户要求不在本次范围。
+
+已关闭旧 Java 的 systemd 开机启动、宝塔项目自动启动，以及 MySQL 的 SysV 开机启动。**当前 Java 和 MySQL 进程仍在运行**：`blog.ug666.top`、`blog.ug666.cn` 尚指向自建服务器。Classic 已部署至 [Vercel 默认正式地址](https://ug-blog-classic.vercel.app)，首页返回 200，完整部署回归由前端会话继续核验；用户负责配置自定义域名。待正式入口切换后衔接停用，此处不表示迁出已完成。
+
+实时核对为文章 30、分类 6、评论 3、留言 13、照片 162，增量计划 0 写入、0 冲突。新增 MySQL SQL 与 Neon 压缩快照均已在临时隔离数据库实际恢复核对，验证库已移除。Java JAR、运行配置和证书已归档，原目录保留。
+
+本轮受限恢复材料在服务器 `/var/backups/ug-blog-retired-20261124/` 和工作区 `temp/blog-offserver-20261124/`；包含 `java-config-before.tar.gz`、`mysql-final-184833.sql`、`neon-before-final.dump` 和 `snapshot-restore-report.json`。本机副本只授权当前用户和 SYSTEM，不提交源码仓。待入口切换后，以停止 Java 后导出的最终数据再次核对，随后停止 MySQL、关闭托管恢复并保留数据目录；Auth / Storage 的每日与每周备份不调整，Blog 的 Neon 周备份继续沿用 ug-backups。
+
 ## 部署
 
 ### Docker 部署
