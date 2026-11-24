@@ -440,8 +440,14 @@ docker run -d \
 ### Vercel 部署
 
 1. 连接 GitHub 仓库到 Vercel
-2. 配置环境变量 `DATABASE_URL` 和 `JWT_SECRET`
+2. 在 Storage 关联 Neon 数据库，由关联注入 `DATABASE_URL`；单独配置 `JWT_SECRET`
 3. 部署应用
+
+当前生产项目为 `ug-blog-service`，API 域名为 `api.blog.ug666.top` 和 `api.blog.ug666.cn`。2026-11-24 将原 Neon `ugblog` 的业务表迁入 Vercel Storage 的 `ug-blog`（新加坡），关联生产、预览和开发环境；底层数据库名为 `neondb`。随后用户确认旧个人 Neon 已全部删除，原库不再作为只读回退副本或恢复来源。恢复使用 GitHub 私有仓库中的备份。
+
+自建服务器上的旧 PostgreSQL `ugblog`、同名账号及其专属备份定时任务已删除，独立快照已验证可恢复。账号遗留的两条 AIHub 默认授权规则已清理，AIHub 的表数据和对象归属保持不变；Java 博客的 MySQL `myblogplus` 仍保留。
+
+数据库备份由私有仓库 [ug-backups](https://github.com/uguang2003/ug-backups) 负责：每周一北京时间 11:15，从 Vercel 关联的 `ug-blog` 正式库导出 PostgreSQL 压缩备份，直接提交到该仓库的 `db/ug-blog/backups/`，长期保留并由用户手动清理。每次提交后重新检出、校验，并在隔离 PostgreSQL 18 中实际恢复核对；校验不再导出正式库。备份无需解密，恢复步骤见该仓库的 `db/ug-blog/README.md`。本仓库原七牛备份工作流已移除；保留的七牛 AK/SK 不参与当前备份。
 
 ### 其他部署方式
 
