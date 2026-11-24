@@ -339,6 +339,28 @@ npx prisma migrate reset
 npx prisma studio
 ```
 
+## 旧 Java 博客增量补齐
+
+2026-11-24 将 Java 博客独立为 [ug-blog-classic](https://github.com/uguang2003/ug-blog-classic)，保留线上 JAR 中的页面、样式和交互，页面只调用本服务现有公开 API。本轮没有改变 API、数据库 Schema 或 Astro 的调用方式。独立前端已完成用户界面验收，尚未上线；Java 服务和 MySQL `myblogplus` 原库继续保留。
+
+已逐字段比较 MySQL 与正式 Neon `neondb`：30 篇文章的正文、标题、分类、封面及时间一致；6 个分类、3 条评论和 13 条留言一致；旧库没有独立标签表。正式库补入照片 ID 170–186 共 17 张，照片由 145 张增至 162 张，30 篇文章的阅读数取两库较大值。未导入旧管理账户、密码或邮箱，也未覆盖新库较新的文章版本。旧评论引用已不存在的父记录时保留为顶层，已有有效回复关系继续保留。
+
+迁移前保留 MySQL 完整 SQL 和 Neon 压缩快照，在隔离 PostgreSQL 18 实际恢复并执行 47 项增量操作，关系检查和重复执行均通过。随后正式执行相同计划；现有账户凭据保持不变。接手复核时重新读取实时 MySQL 与正式 Neon，计划为 0 项写入、0 个冲突。
+
+脚本 `scripts/sync-legacy.mjs` 默认只生成计划，映射、冲突和关系检查在 `scripts/legacy-sync-core.mjs`。在本仓运行：
+
+```powershell
+mise exec -- node --test scripts/legacy-sync.test.mjs
+$env:LEGACY_SOURCE_PATH = '<本机 MySQL JSON 快照绝对路径>'
+$env:LEGACY_TARGET_CONFIG = '<本机目标连接 JSON 绝对路径>'
+$env:LEGACY_REPORT_PATH = '<本机报告 JSON 绝对路径>'
+mise exec -- node scripts/sync-legacy.mjs
+```
+
+源 JSON 使用原 MySQL 表名和字段名；作者只需 `id`、`nickname`、`avatar`，不需要凭据。目标连接 JSON 为 `{ "url": "<PostgreSQL 连接地址>" }`，仅保存在本机。需要执行时，必须先核对报告、验证恢复和隔离迁移，设置 `LEGACY_VERIFIED_SNAPSHOT` 为已验证快照的绝对路径，再加 `--execute`。执行时锁定并重新核对目标数据，遇到真实冲突停止写入。脚本不会删除目标独有数据，不设永久同步或定时任务；双站切换前仍须核对最终增量。
+
+本轮快照和验收证据集中保留在工作区 `temp/blog-classic-20261124/`，不提交数据库快照、个人信息或连接配置。隔离表单提交验证见该目录 `form-report.json`；正式迁移结果见 `production-execute.json`。
+
 ## 部署
 
 ### Docker 部署
