@@ -365,7 +365,7 @@ mise exec -- node scripts/sync-legacy.mjs
 
 2026-11-24 核对服务器：MySQL 只有 `myblogplus` 一个业务库，在线业务连接均来自旧 Java 博客；Auth、Storage、AIHub 使用独立 PostgreSQL，不依赖该 MySQL。`img.ug666.top` 按用户要求不在本次范围。
 
-已关闭旧 Java 的 systemd 开机启动、宝塔项目自动启动，以及 MySQL 的 SysV 开机启动。**当前 Java 和 MySQL 进程仍在运行**：`blog.ug666.top`、`blog.ug666.cn` 尚指向自建服务器。Classic 已部署至 [Vercel 默认正式地址](https://ug-blog-classic.vercel.app)，首页返回 200，完整部署回归由前端会话继续核验；用户负责配置自定义域名。待正式入口切换后衔接停用，此处不表示迁出已完成。
+已关闭旧 Java 的 systemd 开机启动、宝塔项目自动启动，以及 MySQL 的 SysV 开机启动。**当前 Java 和 MySQL 进程仍在运行**：`blog.ug666.top`、`blog.ug666.cn` 尚指向自建服务器。Classic 已部署至 [Vercel 默认正式地址](https://ug-blog-classic.vercel.app)，页面、资源、表单校验和桌面/手机部署回归通过，证据见其 README。用户负责配置自定义域名，并确认当前尚未切换。待正式入口切换后衔接停用，此处不表示迁出已完成。
 
 实时核对为文章 30、分类 6、评论 3、留言 13、照片 162，增量计划 0 写入、0 冲突。新增 MySQL SQL 与 Neon 压缩快照均已在临时隔离数据库实际恢复核对，验证库已移除。Java JAR、运行配置和证书已归档，原目录保留。
 
