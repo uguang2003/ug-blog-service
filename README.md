@@ -359,7 +359,7 @@ mise exec -- node scripts/sync-legacy.mjs
 
 源 JSON 使用原 MySQL 表名和字段名；作者只需 `id`、`nickname`、`avatar`，不需要凭据。目标连接 JSON 为 `{ "url": "<PostgreSQL 连接地址>" }`，仅保存在本机。需要执行时，必须先核对报告、验证恢复和隔离迁移，设置 `LEGACY_VERIFIED_SNAPSHOT` 为已验证快照的绝对路径，再加 `--execute`。执行时锁定并重新核对目标数据，遇到真实冲突停止写入。脚本不会删除目标独有数据，不设永久同步或定时任务；双站切换前仍须核对最终增量。
 
-本轮快照和验收证据集中保留在工作区 `temp/blog-classic-20261124/`，不提交数据库快照、个人信息或连接配置。隔离表单提交验证见该目录 `form-report.json`；正式迁移结果见 `production-execute.json`。
+本轮快照和验收证据集中保留在工作区 `archived/maintenance-recovery-20261124/blog-classic-20261124/`，不提交数据库快照、个人信息或连接配置。隔离表单提交验证见该目录 `form-report.json`；正式迁移结果见 `production-execute.json`。
 
 ### 自建 Java / MySQL 退出状态
 
@@ -373,7 +373,7 @@ Java 的 `spring_myblogplus-1_0_0-RELEASE_jar.service` 已停止、禁用并 mas
 
 停用后复验两域名访客页面与本地图片/样式、两域名公开 API、新后台登录页和 Astro，共 20 个 HTTP 请求均 200。后台实际账号登录未在本轮验证。博客访客站、API/管理后台和 Neon 数据库均不再依赖本机；旧 Nginx/证书配置仍保留，正式 DNS 不再指向它，原 Java 上游已关闭，没有改动自定义域名绑定。`img.ug666.top` 按用户要求保持原样。
 
-恢复材料在服务器 `/var/backups/ug-blog-retired-20261124/` 和工作区 `temp/blog-offserver-20261124/`，目录受限，不提交源码仓：`java-config-before.tar.gz` 保留 JAR、配置和证书；`mysql-final-190810.sql` 为停止 Java 后的最终 SQL；`mysql-datadir-stopped.tar.gz` 为正常停库后的完整 MySQL 数据目录归档；`neon-before-final.dump` 为已验证的 Neon 快照。最终核对、HTTP、服务状态和 SHA-256 清单随归档保存。原 JAR、`/etc/myblogplus/`、`/www/server/data/` 均未删除，Java 和 MySQL 运行时未卸载。Auth / Storage 的每日与每周备份不调整，Blog 的 Neon 周备份继续沿用 ug-backups。
+恢复材料在服务器 `/var/backups/ug-blog-retired-20261124/` 和工作区 `archived/maintenance-recovery-20261124/blog-offserver-20261124/`，目录受限，不提交源码仓：`java-config-before.tar.gz` 保留 JAR、配置和证书；`mysql-final-190810.sql` 为停止 Java 后的最终 SQL；`mysql-datadir-stopped.tar.gz` 为正常停库后的完整 MySQL 数据目录归档；`neon-before-final.dump` 为已验证的 Neon 快照。最终核对、HTTP、服务状态和 SHA-256 清单随归档保存。原 JAR、`/etc/myblogplus/`、`/www/server/data/` 均未删除，Java 和 MySQL 运行时未卸载。Auth / Storage 的每日与每周备份不调整，Blog 的 Neon 周备份继续沿用 ug-backups。
 
 需要回退时先核对切换后 Neon 的新增内容，不直接切回旧数据。使用保留的原目录，可以先 `systemctl unmask mysqld.service mysql.service spring_myblogplus-1_0_0-RELEASE_jar.service`，再通过 `/etc/init.d/mysqld start` 和 `systemctl start spring_myblogplus-1_0_0-RELEASE_jar.service` 手动恢复旧进程；确认数据和入口后再决定是否恢复自动启动。全量恢复材料的说明见本轮归档 README。
 
